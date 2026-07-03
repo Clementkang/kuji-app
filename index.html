@@ -36,8 +36,8 @@
         companyName: "Clem",
         productName: "Kuji_Project",
         productVersion: "1.0",
-        // FIXED RESOLUTION CAP: Locks the pixel ratio to 1 explicitly for mobile browsers
-        devicePixelRatio: 1, 
+        // NATIVE MOBILE SHARPNESS FIX: Matches the physical device pixel density
+        devicePixelRatio: window.devicePixelRatio || 1, 
       };
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
