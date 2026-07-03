@@ -36,7 +36,6 @@
         companyName: "Clem",
         productName: "Kuji_Project",
         productVersion: "1.0",
-        // NATIVE MOBILE SHARPNESS FIX: Matches the physical device pixel density
         devicePixelRatio: window.devicePixelRatio || 1, 
       };
 
@@ -48,10 +47,42 @@
       }
 
       createUnityInstance(document.querySelector("#unity-canvas"), config).then((unityInstance) => {
-        // Successful initialization handler
+        // SUCCESSFUL ENGINE BOOT: Initialize the touch listener to trigger fullscreen and landscape lock
+        setupMobileOrientationLock();
       }).catch((message) => {
         alert(message);
       });
+
+      function setupMobileOrientationLock() {
+        var canvas = document.querySelector("#unity-canvas");
+        
+        // Listen for the very first interaction tap to bypass browser security guards
+        canvas.addEventListener("click", function () {
+          // 1. Enter Fullscreen Mode
+          if (canvas.requestFullscreen) {
+            canvas.requestFullscreen().then(lockOrientation).catch(logError);
+          } else if (canvas.webkitRequestFullscreen) { /* Safari iOS Support */
+            canvas.webkitRequestFullscreen().then(lockOrientation).catch(logError);
+          } else {
+            lockOrientation();
+          }
+        }, { once: true }); // Executing "once: true" strips the event handler right after use to prevent lag
+      }
+
+      function lockOrientation() {
+        // 2. Lock Orientation using standard Screen Orientation API parameters
+        if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
+          window.screen.orientation.lock("landscape").then(function() {
+            console.log("Screen orientation successfully locked into landscape mode.");
+          }).catch(function(error) {
+            console.warn("Screen orientation lock blocked or unsupported on this device: ", error);
+          });
+        }
+      }
+
+      function logError(err) {
+        console.warn("Fullscreen initialization deferred: ", err);
+      }
     </script>
   </body>
 </html>
